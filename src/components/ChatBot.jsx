@@ -27,21 +27,21 @@ export default function ChatBot() {
   const [message, setMessage] = React.useState("");
   const [messages, setMessages] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
-  
+
   const ref = useRef(null);
 
   useEffect(() => {
-
     console.log(
       ref.current.scrollTop,
       ref.current.clientHeight,
-      ref.current.scrollHeight,
-    )
-    const shouldScroll = ref.current.scrollTop + ref.current.clientHeight < ref.current.scrollHeight;
-    if (shouldScroll) {
-      ref.current.scrollTop = ref.current.scrollHeight;
-    }
-  },[messages]);
+      ref.current.scrollHeight
+    );
+    const shouldScroll =
+      ref.current.scrollTop + ref.current.clientHeight <
+      ref.current.scrollHeight;
+    
+      if (shouldScroll) ref.current.scrollTop = ref.current.scrollHeight;
+  }, [messages]);
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -71,9 +71,8 @@ export default function ChatBot() {
     return response.data[0].queryResult.fulfillmentMessages;
   };
 
-  const eventQuery = async (query) => {};
+  // const eventQuery = async (query) => {};
 
-  console.log(ref);
   return (
     <ChatBotWrapper>
       <MessageBox ref={ref}>
