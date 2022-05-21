@@ -20,7 +20,7 @@ export default function Navigation() {
             About
           </MuiLink>
           <MuiLink component={Link} to="/shop" color="inherit"  sx={{ my: 1, mx: 1.5 }}>
-            About
+            Shop
           </MuiLink>
       </Toolbar>
     </AppBar>

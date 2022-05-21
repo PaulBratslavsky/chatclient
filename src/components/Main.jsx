@@ -7,7 +7,7 @@ import Shop from "../pages/Shop";
 
 export default function Main() {
   return (
-    <div>
+    <div style={{ padding: "16px"}}>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/about" element={<About />} />

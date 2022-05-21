@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import axios from "axios";
 
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 
 import styled from "@emotion/styled";
 
@@ -21,12 +20,28 @@ const MessageBox = styled.div`
   border-radius: 4px;
   background-color: #fafafa;
   border: 2px solid #9c26b0;
+  overflow-x: scroll;
 `;
 
 export default function ChatBot() {
   const [message, setMessage] = React.useState("");
   const [messages, setMessages] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  
+  const ref = useRef(null);
+
+  useEffect(() => {
+
+    console.log(
+      ref.current.scrollTop,
+      ref.current.clientHeight,
+      ref.current.scrollHeight,
+    )
+    const shouldScroll = ref.current.scrollTop + ref.current.clientHeight < ref.current.scrollHeight;
+    if (shouldScroll) {
+      ref.current.scrollTop = ref.current.scrollHeight;
+    }
+  },[messages]);
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -34,26 +49,41 @@ export default function ChatBot() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     setMessages([...messages, { message, isUser: true }]);
     setMessage("");
+
     setIsLoading(true);
-    const responseMessage = await textQuery(message);
-    setMessages(prevState => [...prevState, { message: responseMessage, isUser: false }]);
-    setIsLoading(false);  
+
+    const response = await textQuery(message);
+    for (let message of response) {
+      const { text } = message.text;
+      for (let message of text) {
+        setMessages((prevState) => [...prevState, { message, isUser: false }]);
+      }
+    }
+
+    setIsLoading(false);
   };
 
   const textQuery = async (text) => {
-    const response = await axios.post('/api/v1/df_text_query', {text});
-    return response.data[0].queryResult.fulfillmentText;
-  }
+    const response = await axios.post("/api/v1/df_text_query", { text });
+    return response.data[0].queryResult.fulfillmentMessages;
+  };
 
-  const eventQuery = async (query) => {
-    
-  }
+  const eventQuery = async (query) => {};
 
+  console.log(ref);
   return (
     <ChatBotWrapper>
-      <MessageBox>{ messages.map((item, index) => <p key={index}>{item.isUser ? "you: " : "robot: "}{item.message}</p>)}</MessageBox>
+      <MessageBox ref={ref}>
+        {messages.map((item, index) => (
+          <p key={index}>
+            {item.isUser ? "you: " : "robot: "}
+            {item.message}
+          </p>
+        ))}
+      </MessageBox>
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
           onChange={(e) => handleChange(e)}
